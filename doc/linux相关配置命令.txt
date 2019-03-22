@@ -1,0 +1,28 @@
+安装net-tool插件，此插件中带有此命令 
+sudo yum install net-tools
+
+systemctl stop firewalld.service         #停止firewall
+systemctl disable firewalld.service      #禁止firewall开机启动
+firewall-cmd --state                     #查看默认防火墙状态（关闭后显示notrunning，开启后显示running）
+
+
+service mysqld start     #启动mysql
+service mysqld stop		 #停止mysql
+service mysqld status	 #查看mysql状态
+service mysqld restart   #重启mysql
+
+
+网卡配置:
+vi /etc/sysconfig/network-scripts/ifcfg-ens33
+BOOTPROTO="static"
+IPADDR="192.168.71.4"
+NETMASK="255.255.255.0"
+GATEWAY="192.168.71.200"
+DNS1="114.114.114.114"
+
+
+重启网络：service network restart
+
+
+
+mysql -uroot -p          #登陆mysql

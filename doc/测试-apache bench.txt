@@ -1,0 +1,2 @@
+安装apache bench后在dos命令行模拟请求书100，并发量10，验证读负载均衡
+ab -n 100 -c 10 http://www.baidu.com/

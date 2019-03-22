@@ -1,0 +1,78 @@
+主从搭建步骤：(先关闭防火墙)
+
+主节点:
+	1  mysql 开启log_bin:
+	(mysql5.6):
+		修改 /etc/my.cnf 然后重启mysql
+		[mysqld]
+		server-id=1
+		log_bin=/var/lib/mysql/mysql-bin
+	(mysql5.7):
+		修改 /etc/my.cnf 然后重启mysql
+		日志点：
+		[mysqld]	
+		log_bin=mysql-bin
+		server-id=2
+		GTID方式:
+		log_bin=mysql-bin-gtid
+		server-id=2
+		gtid_mode=ON
+		enforce_gtid_consistency=ON
+		binlog_format=row
+		
+	
+	重启mysql：service mysqld restart	
+		
+		
+		
+	2  查看biglog
+		mysqlbinlog --base64-output=DECODE-ROWS -v /var/lib/mysql/mysql-bin.000001
+	   
+	   查看二进制日志开启状态：show variables like 'log_bin';
+	   
+	   查看gtid方式是否开启：
+		show variables like '%gtid_mode%';
+	   查一下mysql的binary log保存目录
+	   show variables like '%log_bin_basename%';
+		
+	3 创建用户
+		主节点
+		-- 创建用户，并授权
+		create user repl identified by 'repl';
+		grant replication slave, replication client on *.* to 'repl'@'%' identified by 'repl';
+
+	4 查看主节点日志
+	show master status\G
+从节点
+	1 (mysql5.6)开启log_bin，重启
+		server-id=3
+		relay-log=/var/lib/mysql/relay-bin
+		relay-log-index=/var/lib/mysql/relay-bin.index
+	  (mysql5.7)
+		日志点：
+	    log_bin=mysql-bin
+		server-id=3
+		relay-log=mysql-relay-bin
+		read_only=ON
+		GTID方式：
+		log_bin=mysql-bin-gtid
+		server-id=3
+		relay-log=mysql-relay-bin-gtid
+		gtid_mode=ON
+		enforce_gtid_consistency=ON
+		binlog_format=row
+
+	2创建用户  create user repl identified by 'repl';
+		
+	3 链接master
+		日志点：
+		change master to master_host='192.168.71.2',master_port=3306,master_user='repl',master_password='repl',master_log_file='mysql-bin.000001',master_log_pos=0;
+		GTID方式:
+		change master to master_host='192.168.71.2',master_port=3306,master_user='repl',master_password='repl',master_auto_position=1;
+		
+	4 启动从节点
+		mysql> start slave；
+		其它命令： 关闭：mysql> stop slave  , 重置： mysql> reset slave;
+
+	5 查看从节点日志  ：  Slave_IO_Running: Yes 和 Slave_SQL_Running: Yes 表示已经成功
+		mysql> show slave status\G;

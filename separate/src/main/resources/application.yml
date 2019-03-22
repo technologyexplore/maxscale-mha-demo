@@ -1,0 +1,46 @@
+
+server:
+  port: 8081
+spring:
+  application:
+    name: separate
+  master:
+    url: jdbc:mysql://192.168.71.90:3306/test1?useUnicode=true&amp;characterEncoding=utf8&amp;emptyStringsConvertToZero=true
+    username: root
+    password: 123456
+    driver_class_namel: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+
+    max-active: 20
+    initial-size: 1
+    min-idle: 3
+    max-wait: 600
+    time-between-eviction-runs-millis: 60000
+    min-evictable-idle-time-millis: 300000
+    test-while-idle: true
+    test-on-borrow: false
+    test-on-return: false
+    poolPreparedStatements: true
+  maxscale:
+    url: jdbc:mysql://192.168.71.10:4006/test1?useUnicode=true&amp;characterEncoding=utf8&amp;emptyStringsConvertToZero=true
+    username: maxscale_route
+    password: 123456
+    driver_class_namel: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+
+    max-active: 20
+    initial-size: 1
+    min-idle: 3
+    max-wait: 600
+    time-between-eviction-runs-millis: 60000
+    min-evictable-idle-time-millis: 300000
+    test-while-idle: true
+    test-on-borrow: false
+    test-on-return: false
+    poolPreparedStatements: true
+  aop:
+    proxy-target-class=false
+
+debug: false
+
+

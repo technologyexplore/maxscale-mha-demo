@@ -1,0 +1,54 @@
+show variables like 'log_bin';     	  查看二进制日志是否开启
+show variables like '%isolation%';    查看事务隔离级别
+
+
+解除密码复杂限制
+set global validate_password_policy=0;
+set global validate_password_length=1;
+
+#授权
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '123456' WITH GRANT OPTION;
+
+
+#克隆导致Slave_IO_Running: NO 
+修改uuid:/var/lib/mysql/auto.cnf
+
+slave机器重起后，事务回滚造成的Slave_SQL_Running: No.
+解决办法：跳过一个事务
+mysql> stop slave ;
+mysql> set GLOBAL SQL_SLAVE_SKIP_COUNTER=1;
+mysql> start slave ;
+
+
+
+#备份
+mysqldump --single-transaction --master-data --triggers --routines --all-databases -uroot -p >> all.sql
+#拷贝到从服务器
+scp all.sql root@192.168.71.4:/root
+#在从服务器上导入sql文件
+mysql -uroot -p < all.sql
+
+
+查看sql执行日志状态，路径
+show variables like "general_log%";
+打开sql执行日志：
+set global general_log=on;
+
+
+查找server-id
+select @@server_id;
+
+
+查看MYSQL数据库中所有用户
+mysql> SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;
+查看数据库中具体某个用户的权限
+mysql> show grants for 'maxscale_route'@'192.168.71.%';   
+
+
+
+查看复制方式
+show global variables like "binlog_format%";
+设置复制方式
+SET SESSION binlog_format = 'ROW';
+
+

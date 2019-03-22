@@ -1,0 +1,31 @@
+https://mariadb.com/downloads/mariadb-tx/maxscale
+安装maxScale的依赖包
+yum install libaio
+安装maxscale
+rpm -ivh maxscale-1.4.5-1.centos.7.x86_64.rpm
+
+所有节点添加路由账户
+create user maxscale_route@'192.168.71.%' identified by "123456";
+GRANT ALL PRIVILEGES ON *.* TO 'maxscale_route'@'192.168.71.%' IDENTIFIED BY '123456' WITH GRANT OPTION;
+
+修改maxScale配置文件
+vi /etc/maxscale.cnf
+
+
+启动maxscale
+maxscale --config=/etc/maxscale.cnf
+service maxscale start
+查看maxscale服务状态
+
+查看maxscale进程
+ps -ef | grep maxscale
+查看maxScale端口
+netstat -ntelp
+
+进入maxscale命令行
+maxadmin --user=admin --password=mariadb
+
+查看监控的服务器
+show servers
+maxscale>list servers
+

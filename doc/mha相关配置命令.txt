@@ -1,0 +1,58 @@
+#建立监控账号，这个账号主要用于检查数据库服务器的监控状况
+create user mha_monitor@'192.168.71.%' identified by "123456";
+GRANT ALL PRIVILEGES ON *.* TO 'mha_monitor'@'192.168.71.%' IDENTIFIED BY '123456' WITH GRANT OPTION;
+#建立代理使用的用户，主要作用是进行主从切换
+create user mha_agent@'192.168.71.%' identified by "123456";
+GRANT ALL PRIVILEGES ON *.* TO 'mha_agent'@'192.168.71.%' IDENTIFIED BY '123456' WITH GRANT OPTION;
+
+
+
+1 使用gtid方式
+2 所有服务器配置ssh：
+  MHA服务器生成密钥:ssh-keygen
+  拷贝公钥：ssh-copy-id root@192.168.71.2
+  测试 ssh root@192.168.71.2
+3 所有服务器安perl支持包:
+   yum -y install perl-DBD-MySQL ncftp perl-DBI.x86     
+4 所有服务器安装MHA node:软件包
+  rpm -ivh mha4mysql-node-0.57-0.el7.noarch.rpm
+5 mha服务器安装mha manager依赖包：
+  yum install perl-DBD-MySQL perl-Config-Tiny perl-Log-Dispatch perl-Parallel-ForkManager perl-Time-HiRes -y
+  依赖包不存在使用多镜像后重新安装依赖包：yum install epel-release -y
+  MHA服务器上安装MHA manager:软件包
+  rpm -ivh mha4mysql-manager-0.57-0.el7.noarch.rpm
+6 每个节点创建mha服务器对主服务器的监控账号
+  create user mha@'192.168.71.%' identified by "123456";
+  GRANT ALL PRIVILEGES ON *.* TO 'mha'@'192.168.71.%' IDENTIFIED BY '123456' WITH GRANT OPTION;
+7 所有服务器新建目录用于存放失败的主服务器下载的二进制日志文件
+  mkdir -p /home/mysql_mha
+8 MHA服务器新建MHA配置文件存放目录:
+  mkdir -p /etc/mha
+  新建配置mha文件
+  cd /etc/mha
+  vi /etc/mha/mysql_mha.cnf
+9 拷贝并修改漂移虚拟ip脚本（ip,虚拟网卡）
+  授权：chmod 777 mha_master_ip_failover
+  vi /usr/bin/master_ip_failover
+10检测ssh
+  masterha_check_ssh --conf=/etc/mha/mysql_mha.cnf
+11检测主从复制环境
+  masterha_check_repl --conf=/etc/mha/mysql_mha.cnf
+12启动mha
+  nohup masterha_manager --conf=/etc/mha/mysql_mha.cnf
+13查看主服务器ip，虚拟ip
+  ip addr
+  手动配置虚拟vip
+  ifconfig ens33:1 192.168.71.90/24
+  
+14查看mha运行状态
+  masterha_check_status --conf=/etc/mha/mysql_mha.cnf  
+  
+  
+  
+  
+  
+停止mhua
+masterha_stop
+  
+  

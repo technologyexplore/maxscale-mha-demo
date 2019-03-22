@@ -1,0 +1,9 @@
+切换原主，在原主执行
+reset slave all；
+
+根据POS点生成反向sql
+perl binlog-rollback.pl -f 'localhost-bin.000023'  -o '/data/t.sql' -u 'recovery' -p '123456' --start-position=1557  --stop-position=1981
+
+
+查看故障点和新主gtid
+show global variables like '%gtid%';
